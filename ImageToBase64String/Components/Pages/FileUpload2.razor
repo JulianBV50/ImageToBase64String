@@ -1,0 +1,24 @@
+﻿@page "/fileupload2"
+@rendermode InteractiveServer
+
+<h3>FileUpload usando Nugget Package NetCodeHub</h3>
+
+<Upload CssClass="bg-danger" Content="GetContent" ></Upload>
+
+@* Para visualizar archivos de imagen *@
+@* <Preview PreviewContent="fileModel" ShowImage=true ImageCustomStyle="width:500px;height:300px"></Preview> *@
+
+@* Para visualizar archivos tipo TXT y PDF *@
+<Preview PreviewContent="fileModel" ShowOthers=true></Preview>
+<h1>@fileModel.Error</h1>
+<h1>@fileModel.File?.ContentType</h1>
+
+@code {
+    FileModel fileModel = new();
+
+    void GetContent(FileModel fm) => fileModel = fm;
+}
+
+
+
+

@@ -1,0 +1,57 @@
+﻿@page "/fileupload"
+@rendermode InteractiveServer
+
+<style>
+    .contenedor-destino-arrastre {
+        display: flex;
+        width: 100%;
+        border: 3px dotted red;
+        align-items: center;
+        margin-bottom: 4px;
+    }
+
+    .hover {
+        border-style: solid;
+        background-color: green;
+    }
+
+    .contenedor-image img {
+        width: 40%;
+        margin: 1rem;
+    }
+
+    ::deep input[type=file] {
+        width: 100%;
+        padding: 20px;
+    }
+</style>
+
+<div class="contenedor-destino-arrastre @claseEncima" @ondragenter="EntrarImagen" @ondragover="EntrarImagen" @ondragleave="SalirImagen">
+    <InputFile multiple OnChange="Cambio"></InputFile>
+</div>
+
+<div>
+    @foreach (var im in imagenes)
+    {
+        <img src="@im" width="200" height="200" />
+    }
+</div>
+
+@code {
+    private List<string> imagenes = new List<string>();
+    private string claseEncima = string.Empty;
+
+    async Task Cambio(InputFileChangeEventArgs e)
+    {
+        foreach (var f in e.GetMultipleFiles())
+        {
+            using var stream = f.OpenReadStream();
+            using var memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream);
+            imagenes.Add($"data:{f.ContentType};base64,{Convert.ToBase64String(memoryStream.ToArray())}");
+        }
+    }
+
+    void EntrarImagen(DragEventArgs e) => claseEncima = "hover";
+    void SalirImagen(DragEventArgs e) => claseEncima = string.Empty;
+}

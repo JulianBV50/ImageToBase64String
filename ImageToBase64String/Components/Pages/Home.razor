@@ -1,0 +1,59 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Forms
+@using System.IO
+@inject IJSRuntime JSRuntime
+
+<a href="/fileupload" class="btn btn-primary">Cargas Imagenes</a>
+<a href="/fileupload2" class="btn btn-primary">Cargas Imagenes 2</a>
+
+<div class="container">
+
+    <h3>Convert File to Base64 - CodeLSC</h3>
+
+    <label for="images" class="drop-container">
+
+        <span class="drop-title">Drop files here</span>
+
+        or
+
+        <InputFile id="images" class="file-input" OnChange="HandleFileSelection"></InputFile>
+
+    </label>
+
+    @if (!string.IsNullOrEmpty(base64String))
+    {
+        <div class="base64-string">
+            <button class=" btn btn-primary" @onclick="CopyBase64String">Copy</button>
+            <div style="padding: 20px;">
+                @base64String
+            </div>
+        </div>
+    }
+
+</div>
+
+@code {
+
+    private string base64String = string.Empty;
+
+    private async Task HandleFileSelection(InputFileChangeEventArgs e)
+    {
+        var file = e.GetMultipleFiles().FirstOrDefault();
+        if (file != null)
+        {
+            var buffer = new byte[file.Size];
+            using (var stream = file.OpenReadStream())
+            {
+                await stream.ReadAsync(buffer, 0, buffer.Length);
+            }
+            base64String = Convert.ToBase64String(buffer);
+        }
+    }
+
+    private async Task CopyBase64String()
+    {
+        await JSRuntime.InvokeAsync<object>("navigator.clipboard.writeText", new object[] { base64String });
+    }
+
+}
